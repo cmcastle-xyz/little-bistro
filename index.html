@@ -3,91 +3,119 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>我的云餐厅 - 玉桂狗</title>
+<title>玉桂狗美食社区</title>
 <style>
-  *{margin:0;padding:0;box-sizing:border-box;font-family:Microsoft YaHei,sans-serif}
-  body{background:#fff9e6;padding:20px;min-height:100vh}
-  .container{max-width:700px;margin:30px auto;background:#fff;border-radius:24px;padding:30px;box-shadow:0 8px 30px rgba(100,120,255,0.1)}
-  .title{text-align:center;color:#4a90ff;margin-bottom:10px}
-  .subtitle{text-align:center;color:#ff85a2;margin-bottom:30px}
-  .auth-box{display:flex;flex-direction:column;gap:12px;margin-bottom:20px}
+  *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui,sans-serif}
+  body{background:#fff9e6;padding:15px;min-height:100vh}
+  .container{max-width:700px;margin:0 auto;background:#fff;border-radius:24px;padding:25px;box-shadow:0 8px 30px rgba(100,120,255,0.1)}
+  .title{text-align:center;color:#4a90ff;margin-bottom:6px}
+  .subtitle{text-align:center;color:#ff85a2;margin-bottom:16px}
+  .dog{text-align:center;font-size:48px;margin-bottom:10px}
+  .auth-box{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
   .auth-box input{padding:12px;border-radius:12px;border:1px solid #ffe6f0;background:#fffdf5}
   .auth-btn{display:flex;gap:10px}
   .auth-btn button{flex:1;padding:12px;border:none;border-radius:12px;background:#4a90ff;color:white;font-weight:bold}
-  .user-info{text-align:center;margin-bottom:20px;color:#4a90ff}
-  .add-box{display:flex;gap:10px;margin:20px 0;flex-wrap:wrap}
-  .add-box input,select{flex:1;min-width:120px;padding:12px;border-radius:12px;border:1px solid #ffe6f0;background:#fffdf5}
-  .add-btn{padding:12px 16px;background:#4a90ff;color:white;border:none;border-radius:12px}
-  .dish{background:#fffbf0;border-left:6px solid #ffd166;padding:16px;border-radius:16px;margin-bottom:12px}
-  .dish-main{display:flex;justify-content:space-between;align-items:center}
-  .dish-name{font-size:16px;color:#333}
-  .dish-cate{font-size:13px;color:#4a90ff;background:#eef5ff;padding:3px 8px;border-radius:6px;margin-right:8px}
-  .dish-price{color:#ff6b9d;font-weight:bold}
-  .del-btn{background:#ff85a2;color:white;border:none;padding:6px 10px;border-radius:8px;font-size:12px}
-  .comment-box{margin-top:10px}
-  .comment-input{width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;margin-top:6px}
-  .send-btn{margin-top:6px;padding:6px 12px;background:#4a90ff;color:white;border:none;border-radius:8px;font-size:12px}
+  .nav{display:flex;gap:10px;margin-bottom:15px}
+  .nav button{flex:1;padding:10px;border-radius:12px;border:none;background:#eef5ff;color:#4a90ff}
+  .search-box{width:100%;padding:12px;border-radius:12px;border:1px solid #ddd;margin-bottom:15px}
+  .post-box{border:1px solid #eee;border-radius:16px;padding:15px;margin-bottom:15px}
+  .post-input{width:100%;padding:10px;border:1px solid #ddd;border-radius:10px;margin-bottom:10px}
+  .preview{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+  .preview img{width:60px;height:60px;object-fit:cover;border-radius:8px}
+  .btn{padding:10px 14px;background:#4a90ff;color:white;border:none;border-radius:10px;margin-right:5px}
+  .pink{background:#ff85a2}
+  .yellow{background:#ffd166;color:#333}
+  .post{background:#fffbf0;border-radius:16px;padding:16px;margin-bottom:12px}
+  .post-user{color:#4a90ff;font-weight:bold;margin-bottom:6px}
+  .post-content{margin:8px 0}
+  .post-imgs{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+  .post-imgs img{max-width:100px;height:100px;object-fit:cover;border-radius:10px}
+  .stars{color:#ffd166;font-size:18px;margin:6px 0}
   .comment{background:#f0f7ff;padding:6px 10px;border-radius:6px;margin-top:6px;font-size:14px}
+  .user-info{text-align:center;margin-bottom:15px;color:#4a90ff}
+  .section{display:none}
+  .section.active{display:block}
   .empty{text-align:center;padding:30px;color:#aaa}
-  .logout{text-align:center;margin-top:20px}
-  .logout button{padding:8px 16px;background:#ff85a2;color:white;border:none;border-radius:10px}
+  .follow{margin:8px 0}
+  .item{padding:8px 12px;background:#f7f9ff;border-radius:8px;margin-bottom:8px}
 </style>
 </head>
 <body>
 <div class="container">
-  <h2 class="title">🐶 我的云餐厅</h2>
-  <p class="subtitle">玉桂狗陪你安心点餐</p>
+  <div class="dog">🐶</div>
+  <h2 class="title">玉桂狗美食社区</h2>
+  <p class="subtitle">三丽鸥美食菜谱分享</p>
 
   <div class="auth-box" id="authBox">
-    <input type="text" id="phone" placeholder="请输入手机号">
-    <input type="password" id="pwd" placeholder="请输入密码">
+    <input type="text" id="phone" placeholder="手机号">
+    <input type="password" id="pwd" placeholder="密码">
     <div class="auth-btn">
       <button onclick="register()">注册</button>
       <button onclick="login()">登录</button>
     </div>
   </div>
 
-  <div class="user-info" id="userInfo" style="display:none"></div>
-
   <div id="main" style="display:none">
-    <div class="add-box">
-      <input type="text" id="dishName" placeholder="菜品名称">
-      <input type="number" id="dishPrice" placeholder="价格">
-      <select id="dishCate">
-        <option>热销</option><option>主食</option><option>小吃</option><option>饮品</option><option>甜品</option>
-      </select>
-      <button class="add-btn" onclick="addDish()">添加</button>
+    <div class="user-info" id="userInfo"></div>
+    <div class="nav">
+      <button onclick="go('home')">首页</button>
+      <button onclick="go('profile')">我的主页</button>
+    </div>
+    <input class="search-box" id="search" placeholder="搜索美食..." oninput="search()">
+
+    <div id="home" class="section active">
+      <div class="post-box">
+        <textarea class="post-input" id="content" placeholder="分享你的美食菜谱~"></textarea>
+        <input type="file" id="imgFiles" multiple accept="image/*" onchange="previewImgs()">
+        <div class="preview" id="preview"></div>
+        <button class="btn" onclick="post()">发布</button>
+      </div>
+      <div id="list"></div>
     </div>
 
-    <div id="dishList"></div>
-
-    <div class="logout">
-      <button onclick="logout()">退出登录</button>
+    <div id="profile" class="section">
+      <div style="display:flex;gap:10px;margin-bottom:16px">
+        <button class="btn" onclick="showFollow('follow')">我关注</button>
+        <button class="btn" onclick="showFollow('fans')">粉丝</button>
+      </div>
+      <div id="followList" class="follow"></div>
+      <h3 style="margin-bottom:10px;color:#4a90ff">我发布的</h3>
+      <div id="myPosts"></div>
+      <h3 style="margin:20px 0;color:#4a90ff">我的心愿单</h3>
+      <div id="wishlist"></div>
+      <button class="btn pink" onclick="logout()" style="margin-top:20px">退出登录</button>
     </div>
   </div>
 </div>
 
 <script>
 let users = JSON.parse(localStorage.getItem('users')) || {}
-let dishes = JSON.parse(localStorage.getItem('dishes')) || []
-let currentUser = null
+let posts = JSON.parse(localStorage.getItem('posts')) || []
+let currentUser = localStorage.getItem('currentUser')
+let imgList = []
 
-function $(id){ return document.getElementById(id) }
+let wish = JSON.parse(localStorage.getItem('wish')) || {}
+let follow = JSON.parse(localStorage.getItem('follow')) || {}
+let fans = JSON.parse(localStorage.getItem('fans')) || {}
+
+function $(id){return document.getElementById(id)}
 
 function register(){
-  let phone = $('phone').value.trim()
-  let pwd = $('pwd').value.trim()
-  if(!phone || !pwd){ alert('请输入手机号和密码'); return }
-  if(users[phone]){ alert('已注册'); return }
+  let phone = $('phone').value.trim(), pwd = $('pwd').value.trim()
+  if(!phone||!pwd)return alert('请输入完整')
+  if(users[phone])return alert('已注册')
   users[phone] = pwd
+  follow[phone] = []
+  fans[phone] = []
   localStorage.setItem('users', JSON.stringify(users))
+  localStorage.setItem('follow', JSON.stringify(follow))
+  localStorage.setItem('fans', JSON.stringify(fans))
   alert('注册成功！请登录')
 }
 
 function login(){
-  let phone = $('phone').value.trim()
-  let pwd = $('pwd').value.trim()
-  if(!users[phone] || users[phone]!==pwd){ alert('账号或密码错误'); return }
+  let phone = $('phone').value.trim(), pwd = $('pwd').value.trim()
+  if(users[phone] !== pwd)return alert('账号或密码错误')
   currentUser = phone
   localStorage.setItem('currentUser', currentUser)
   showMain()
@@ -95,10 +123,130 @@ function login(){
 
 function showMain(){
   $('authBox').style.display = 'none'
-  $('userInfo').style.display = 'block'
-  $('userInfo').innerText = '欢迎：' + currentUser
   $('main').style.display = 'block'
-  renderDishes()
+  $('userInfo').innerText = '欢迎：' + currentUser
+  renderHome()
+}
+
+function go(id){
+  document.querySelectorAll('.section').forEach(e=>e.classList.remove('active'))
+  $(id).classList.add('active')
+  if(id === 'profile') renderProfile()
+}
+
+function previewImgs(){
+  let files = $('imgFiles').files
+  imgList = []
+  $('preview').innerHTML = ''
+  for(let i=0;i<Math.min(files.length,6);i++){
+    let f = files[i]
+    let r = new FileReader()
+    r.onload = e=>{
+      imgList.push(e.target.result)
+      let img = document.createElement('img')
+      img.src = e.target.result
+      $('preview').appendChild(img)
+    }
+    r.readAsDataURL(f)
+  }
+}
+
+function post(){
+  if(!currentUser)return alert('请登录')
+  let c = $('content').value.trim()
+  if(!c && imgList.length===0)return alert('写点内容吧')
+  posts.unshift({user:currentUser, content:c, imgs:imgList, comments:[], rate:0})
+  localStorage.setItem('posts', JSON.stringify(posts))
+  $('content').value = ''
+  imgList = []
+  $('preview').innerHTML = ''
+  renderHome()
+}
+
+function renderHome(list=posts){
+  let h = ''
+  if(list.length===0) h='<div class="empty">暂无内容</div>'
+  else list.forEach((p,i)=>{
+    let isFollow = follow[currentUser]?.includes(p.user)
+    let followBtn = p.user === currentUser ? '' :
+      `<button class="btn yellow" onclick="toggleFollow('${p.user}')">${isFollow?'已关注':'关注'}</button>`
+    h+=`
+    <div class="post">
+      <div class="post-user">${p.user}</div>
+      ${followBtn}
+      <div class="post-content">${p.content}</div>
+      <div class="post-imgs">${p.imgs.map(s=>`<img src="${s}">`).join('')}</div>
+      <div class="stars">${'★'.repeat(p.rate||0)}</div>
+      <button class="btn" onclick="setRate(${i})">⭐打分</button>
+      <button class="btn pink" onclick="addWish(${i})">加入心愿单</button>
+      <input placeholder="评论" id="ci${i}" style="margin-top:8px;width:100%;padding:8px">
+      <button class="btn" onclick="addComment(${i})">发送</button>
+      ${p.comments.map(m=>`<div class="comment">${m.user}: ${m.text}</div>`).join('')}
+    </div>`
+  })
+  $('list').innerHTML = h
+}
+
+function addComment(i){
+  if(!currentUser)return
+  let t = $('ci'+i).value.trim()
+  if(!t)return
+  posts[i].comments.push({user:currentUser, text:t})
+  localStorage.setItem('posts', JSON.stringify(posts))
+  renderHome()
+}
+
+function setRate(i){
+  let s = prompt('输入1-5星','5')
+  if(!s||s<1||s>5)return
+  posts[i].rate = +s
+  localStorage.setItem('posts', JSON.stringify(posts))
+  renderHome()
+}
+
+function addWish(i){
+  if(!currentUser)return
+  if(!wish[currentUser]) wish[currentUser] = []
+  wish[currentUser].push(posts[i])
+  localStorage.setItem('wish', JSON.stringify(wish))
+  alert('已加入心愿单')
+}
+
+function toggleFollow(target){
+  if(target === currentUser)return
+  if(!follow[currentUser]) follow[currentUser] = []
+  if(!fans[target]) fans[target] = []
+  let idx = follow[currentUser].indexOf(target)
+  if(idx === -1){
+    follow[currentUser].push(target)
+    fans[target].push(currentUser)
+  }else{
+    follow[currentUser].splice(idx,1)
+    fans[target] = fans[target].filter(u=>u!==currentUser)
+  }
+  localStorage.setItem('follow', JSON.stringify(follow))
+  localStorage.setItem('fans', JSON.stringify(fans))
+  renderHome()
+}
+
+function search(){
+  let kw = $('search').value.toLowerCase()
+  let f = posts.filter(p=>p.content.toLowerCase().includes(kw))
+  renderHome(f)
+}
+
+function renderProfile(){
+  let my = posts.filter(p=>p.user === currentUser)
+  let w = wish[currentUser] || []
+  $('myPosts').innerHTML = my.length ? my.map((p,i)=>`
+  <div class="post"><div class="post-content">${p.content}</div></div>`).join(''):'<div class="empty">暂无发布</div>'
+  $('wishlist').innerHTML = w.length ? w.map((p,i)=>`
+  <div class="post"><div class="post-content">${p.content}</div></div>`).join(''):'<div class="empty">暂无心愿</div>'
+}
+
+function showFollow(type){
+  let list = type === 'follow' ? (follow[currentUser]||[]) : (fans[currentUser]||[])
+  $('followList').innerHTML = list.length ? list.map(u=>`<div class="item">${u}</div>`).join(''):'<div class="empty">暂无</div>'
 }
 
 function logout(){
@@ -107,53 +255,8 @@ function logout(){
   location.reload()
 }
 
-function renderDishes(){
-  let html = ''
-  if(dishes.length===0) html='<div class="empty">快来添加菜品吧～</div>'
-  else dishes.forEach((item,i)=>{
-    html+=`
-    <div class="dish">
-      <div class="dish-main">
-        <div><span class="dish-cate">${item.cate}</span><span class="dish-name">${item.name}</span></div>
-        <div style="display:flex;gap:8px">
-          <span class="dish-price">¥${item.price}</span>
-          <button class="del-btn" onclick="delDish(${i})">删除</button>
-        </div>
-      </div>
-      <div class="comment-box">
-        <input class="comment-input" id="c${i}" placeholder="发表评价">
-        <button class="send-btn" onclick="sendComment(${i})">发布</button>
-        <div>${(item.comments||[]).map(m=>`<div class="comment">${m.user}：${m.text}</div>`).join('')}</div>
-      </div>
-    </div>`
-  })
-  $('dishList').innerHTML = html
-}
-
-function addDish(){
-  let n = $('dishName').value.trim(), p = $('dishPrice').value.trim(), c = $('dishCate').value
-  if(!n||!p){alert('请填写完整');return}
-  dishes.push({name:n,price:p,cate:c,comments:[]})
-  localStorage.setItem('dishes',JSON.stringify(dishes))
-  $('dishName').value='';$('dishPrice').value=''
-  renderDishes()
-}
-
-function delDish(i){ dishes.splice(i,1); localStorage.setItem('dishes',JSON.stringify(dishes)); renderDishes() }
-function sendComment(i){
-  if(!currentUser){alert('请登录');return}
-  let t = $('c'+i).value.trim()
-  if(!t){alert('请输入内容');return}
-  if(!dishes[i].comments) dishes[i].comments=[]
-  dishes[i].comments.push({user:currentUser,text:t})
-  localStorage.setItem('dishes',JSON.stringify(dishes))
-  $('c'+i).value=''
-  renderDishes()
-}
-
 window.onload=()=>{
-  let u=localStorage.getItem('currentUser')
-  if(u&&users[u]){currentUser=u;showMain()}
+  if(currentUser && users[currentUser]) showMain()
 }
 </script>
 </body>
