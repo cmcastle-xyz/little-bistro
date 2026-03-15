@@ -28,6 +28,7 @@
   .post{background:#fffbf0;border-radius:16px;padding:16px;margin-bottom:12px}
   .post-user{color:#4a90ff;font-weight:bold;margin-bottom:6px}
   .post-content{margin:8px 0}
+  .post-info{font-size:14px;color:#666;margin:4px 0}
   .post-imgs{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
   .post-imgs img{max-width:100px;height:100px;object-fit:cover;border-radius:10px}
   .stars{color:#ffd166;font-size:18px;margin:6px 0}
@@ -61,11 +62,13 @@
       <button onclick="go('home')">首页</button>
       <button onclick="go('profile')">我的主页</button>
     </div>
-    <input class="search-box" id="search" placeholder="搜索美食..." oninput="search()">
+    <input class="search-box" id="search" placeholder="搜索美食、地址、电话..." oninput="search()">
 
     <div id="home" class="section active">
       <div class="post-box">
         <textarea class="post-input" id="content" placeholder="分享你的美食菜谱~"></textarea>
+        <input class="post-input" id="shopAddr" placeholder="店家地址">
+        <input class="post-input" id="shopTel" placeholder="店家电话">
         <input type="file" id="imgFiles" multiple accept="image/*" onchange="previewImgs()">
         <div class="preview" id="preview"></div>
         <button class="btn" onclick="post()">发布</button>
@@ -151,13 +154,36 @@ function previewImgs(){
   }
 }
 
+// 格式化日期时间为 YYYY-MM-DD HH:mm:ss
+function formatDateTime(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  return `${year}-${month}-${day} ${hours}:${minutes}`;
+}
+
 function post(){
   if(!currentUser)return alert('请登录')
   let c = $('content').value.trim()
+  let addr = $('shopAddr').value.trim()
+  let tel = $('shopTel').value.trim()
   if(!c && imgList.length===0)return alert('写点内容吧')
-  posts.unshift({user:currentUser, content:c, imgs:imgList, comments:[], rate:0})
+  posts.unshift({
+    user:currentUser,
+    content:c,
+    addr:addr,
+    tel:tel,
+    imgs:imgList,
+    comments:[],
+    rate:0,
+    time: formatDateTime(new Date()) // 记录发布时间
+  })
   localStorage.setItem('posts', JSON.stringify(posts))
   $('content').value = ''
+  $('shopAddr').value = ''
+  $('shopTel').value = ''
   imgList = []
   $('preview').innerHTML = ''
   renderHome()
@@ -174,7 +200,10 @@ function renderHome(list=posts){
     <div class="post">
       <div class="post-user">${p.user}</div>
       ${followBtn}
+      <div class="post-info">📅发布时间：${p.time || '未知时间'}</div>
       <div class="post-content">${p.content}</div>
+      <div class="post-info">📍地址：${p.addr || '未填写'}</div>
+      <div class="post-info">📞电话：${p.tel || '未填写'}</div>
       <div class="post-imgs">${p.imgs.map(s=>`<img src="${s}">`).join('')}</div>
       <div class="stars">${'★'.repeat(p.rate||0)}</div>
       <button class="btn" onclick="setRate(${i})">⭐打分</button>
@@ -230,18 +259,28 @@ function toggleFollow(target){
 }
 
 function search(){
-  let kw = $('search').value.toLowerCase()
-  let f = posts.filter(p=>p.content.toLowerCase().includes(kw))
-  renderHome(f)
+  let kw = $('search').value.trim().toLowerCase()
+  let filtered = posts.filter(p => 
+    p.content.toLowerCase().includes(kw) || 
+    (p.addr || '').toLowerCase().includes(kw) || 
+    (p.tel || '').toLowerCase().includes(kw)
+  )
+  renderHome(filtered)
 }
 
 function renderProfile(){
   let my = posts.filter(p=>p.user === currentUser)
   let w = wish[currentUser] || []
   $('myPosts').innerHTML = my.length ? my.map((p,i)=>`
-  <div class="post"><div class="post-content">${p.content}</div></div>`).join(''):'<div class="empty">暂无发布</div>'
+  <div class="post">
+    <div class="post-info">📅${p.time || '未知时间'}</div>
+    <div class="post-content">${p.content}</div>
+    <div class="post-info">📍${p.addr || '无地址'}</div>
+  </div>`).join(''):'<div class="empty">暂无发布</div>'
   $('wishlist').innerHTML = w.length ? w.map((p,i)=>`
-  <div class="post"><div class="post-content">${p.content}</div></div>`).join(''):'<div class="empty">暂无心愿</div>'
+  <div class="post">
+    <div class="post-content">${p.content}</div>
+  </div>`).join(''):'<div class="empty">暂无心愿</div>'
 }
 
 function showFollow(type){
