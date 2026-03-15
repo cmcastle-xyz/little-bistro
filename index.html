@@ -74,138 +74,86 @@ let currentUser = null
 
 function $(id){ return document.getElementById(id) }
 
-// 注册
 function register(){
   let phone = $('phone').value.trim()
   let pwd = $('pwd').value.trim()
-  if(!phone || !pwd){
-    alert('请输入手机号和密码')
-    return
-  }
-  if(users[phone]){
-    alert('该手机号已注册')
-    return
-  }
+  if(!phone || !pwd){ alert('请输入手机号和密码'); return }
+  if(users[phone]){ alert('已注册'); return }
   users[phone] = pwd
   localStorage.setItem('users', JSON.stringify(users))
-  alert('注册成功！请点击登录')
+  alert('注册成功！请登录')
 }
 
-// 登录
 function login(){
   let phone = $('phone').value.trim()
   let pwd = $('pwd').value.trim()
-
-  if(!users[phone]){
-    alert('该用户未注册')
-    return
-  }
-  if(users[phone] !== pwd){
-    alert('密码错误')
-    return
-  }
-
+  if(!users[phone] || users[phone]!==pwd){ alert('账号或密码错误'); return }
   currentUser = phone
   localStorage.setItem('currentUser', currentUser)
   showMain()
 }
 
-// 显示主页
 function showMain(){
   $('authBox').style.display = 'none'
   $('userInfo').style.display = 'block'
-  $('userInfo').innerText = '欢迎你：' + currentUser
+  $('userInfo').innerText = '欢迎：' + currentUser
   $('main').style.display = 'block'
   renderDishes()
 }
 
-// 退出登录
 function logout(){
   currentUser = null
   localStorage.removeItem('currentUser')
   location.reload()
 }
 
-// 渲染菜品
 function renderDishes(){
   let html = ''
-  if(dishes.length === 0){
-    html = '<div class="empty">快来添加第一道菜品吧～</div>'
-  }else{
-    dishes.forEach((item,index)=>{
-      html+=`
-      <div class="dish">
-        <div class="dish-main">
-          <div>
-            <span class="dish-cate">${item.cate}</span>
-            <span class="dish-name">${item.name}</span>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <span class="dish-price">¥${item.price}</span>
-            <button class="del-btn" onclick="delDish(${index})">删除</button>
-          </div>
+  if(dishes.length===0) html='<div class="empty">快来添加菜品吧～</div>'
+  else dishes.forEach((item,i)=>{
+    html+=`
+    <div class="dish">
+      <div class="dish-main">
+        <div><span class="dish-cate">${item.cate}</span><span class="dish-name">${item.name}</span></div>
+        <div style="display:flex;gap:8px">
+          <span class="dish-price">¥${item.price}</span>
+          <button class="del-btn" onclick="delDish(${i})">删除</button>
         </div>
-        <div class="comment-box">
-          <input class="comment-input" id="com${index}" placeholder="说点什么…">
-          <button class="send-btn" onclick="sendComment(${index})">发表评价</button>
-          <div id="commentList${index}">
-            ${(item.comments||[]).map(c=>`<div class="comment">${c.user}: ${c.text}</div>`).join('')}
-          </div>
-        </div>
-      </div>`
-    })
-  }
+      </div>
+      <div class="comment-box">
+        <input class="comment-input" id="c${i}" placeholder="发表评价">
+        <button class="send-btn" onclick="sendComment(${i})">发布</button>
+        <div>${(item.comments||[]).map(m=>`<div class="comment">${m.user}：${m.text}</div>`).join('')}</div>
+      </div>
+    </div>`
+  })
   $('dishList').innerHTML = html
 }
 
-// 添加菜品
 function addDish(){
-  let name = $('dishName').value.trim()
-  let price = $('dishPrice').value.trim()
-  let cate = $('dishCate').value
-  if(!name || !price){
-    alert('请填写菜品名称和价格')
-    return
-  }
-  dishes.push({name,price,cate,comments:[]})
+  let n = $('dishName').value.trim(), p = $('dishPrice').value.trim(), c = $('dishCate').value
+  if(!n||!p){alert('请填写完整');return}
+  dishes.push({name:n,price:p,cate:c,comments:[]})
   localStorage.setItem('dishes',JSON.stringify(dishes))
-  $('dishName').value=''
-  $('dishPrice').value=''
+  $('dishName').value='';$('dishPrice').value=''
   renderDishes()
 }
 
-// 删除菜品
-function delDish(index){
-  dishes.splice(index,1)
+function delDish(i){ dishes.splice(i,1); localStorage.setItem('dishes',JSON.stringify(dishes)); renderDishes() }
+function sendComment(i){
+  if(!currentUser){alert('请登录');return}
+  let t = $('c'+i).value.trim()
+  if(!t){alert('请输入内容');return}
+  if(!dishes[i].comments) dishes[i].comments=[]
+  dishes[i].comments.push({user:currentUser,text:t})
   localStorage.setItem('dishes',JSON.stringify(dishes))
+  $('c'+i).value=''
   renderDishes()
 }
 
-// 发表评价
-function sendComment(index){
-  if(!currentUser){
-    alert('请先登录')
-    return
-  }
-  let text = $(`com${index}`).value.trim()
-  if(!text){
-    alert('请输入评价内容')
-    return
-  }
-  if(!dishes[index].comments) dishes[index].comments = []
-  dishes[index].comments.push({user:currentUser, text})
-  localStorage.setItem('dishes',JSON.stringify(dishes))
-  $(`com${index}`).value=''
-  renderDishes()
-}
-
-// 页面加载时自动登录
-window.onload = function(){
-  let user = localStorage.getItem('currentUser')
-  if(user && users[user]){
-    currentUser = user
-    showMain()
-  }
+window.onload=()=>{
+  let u=localStorage.getItem('currentUser')
+  if(u&&users[u]){currentUser=u;showMain()}
 }
 </script>
 </body>
