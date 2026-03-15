@@ -25,6 +25,7 @@
   .btn{padding:10px 14px;background:#4a90ff;color:white;border:none;border-radius:10px;margin-right:5px}
   .pink{background:#ff85a2}
   .yellow{background:#ffd166;color:#333}
+  .gray{background:#ccc;color:#333}
   .post{background:#fffbf0;border-radius:16px;padding:16px;margin-bottom:12px}
   .post-user{color:#4a90ff;font-weight:bold;margin-bottom:6px}
   .post-content{margin:8px 0}
@@ -32,7 +33,12 @@
   .post-imgs{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
   .post-imgs img{max-width:100px;height:100px;object-fit:cover;border-radius:10px}
   .stars{color:#ffd166;font-size:18px;margin:6px 0}
-  .comment{background:#f0f7ff;padding:6px 10px;border-radius:6px;margin-top:6px;font-size:14px}
+  .comment{background:#f0f7ff;padding:8px 12px;border-radius:8px;margin-top:8px;font-size:14px}
+  .comment-user{color:#4a90ff;font-weight:bold}
+  .comment-time{font-size:12px;color:#999;margin-left:8px}
+  .comment-actions{margin-top:4px;font-size:12px}
+  .comment-actions button{background:none;border:none;color:#4a90ff;padding:0 4px}
+  .edit-area{width:100%;padding:10px;border:1px solid #ddd;border-radius:10px;margin:8px 0}
   .user-info{text-align:center;margin-bottom:15px;color:#4a90ff}
   .section{display:none}
   .section.active{display:block}
@@ -154,7 +160,6 @@ function previewImgs(){
   }
 }
 
-// 格式化日期时间为 YYYY-MM-DD HH:mm:ss
 function formatDateTime(date) {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -178,7 +183,7 @@ function post(){
     imgs:imgList,
     comments:[],
     rate:0,
-    time: formatDateTime(new Date()) // 记录发布时间
+    time: formatDateTime(new Date())
   })
   localStorage.setItem('posts', JSON.stringify(posts))
   $('content').value = ''
@@ -189,6 +194,40 @@ function post(){
   renderHome()
 }
 
+// 编辑帖子
+function editPost(i){
+  let p = posts[i]
+  let newContent = prompt('修改内容', p.content)
+  let newAddr = prompt('修改地址', p.addr)
+  let newTel = prompt('修改电话', p.tel)
+  if(newContent === null || newAddr === null || newTel === null) return
+  posts[i].content = newContent.trim()
+  posts[i].addr = newAddr.trim()
+  posts[i].tel = newTel.trim()
+  localStorage.setItem('posts', JSON.stringify(posts))
+  renderHome()
+}
+
+// 渲染评论
+function renderComments(comments, postIndex){
+  if(!comments || comments.length === 0) return ''
+  return comments.map((c, j) => `
+    <div class="comment">
+      <div>
+        <span class="comment-user">${c.user}</span>
+        <span class="comment-time">${c.time}</span>
+      </div>
+      <div>${c.text}</div>
+      ${c.user === currentUser ? `
+        <div class="comment-actions">
+          <button onclick="editComment(${postIndex}, ${j})">编辑</button>
+          <button onclick="deleteComment(${postIndex}, ${j})">删除</button>
+        </div>
+      ` : ''}
+    </div>
+  `).join('')
+}
+
 function renderHome(list=posts){
   let h = ''
   if(list.length===0) h='<div class="empty">暂无内容</div>'
@@ -196,10 +235,13 @@ function renderHome(list=posts){
     let isFollow = follow[currentUser]?.includes(p.user)
     let followBtn = p.user === currentUser ? '' :
       `<button class="btn yellow" onclick="toggleFollow('${p.user}')">${isFollow?'已关注':'关注'}</button>`
+    let editBtn = p.user === currentUser ? 
+      `<button class="btn gray" onclick="editPost(${i})">编辑</button>` : ''
     h+=`
     <div class="post">
       <div class="post-user">${p.user}</div>
       ${followBtn}
+      ${editBtn}
       <div class="post-info">📅发布时间：${p.time || '未知时间'}</div>
       <div class="post-content">${p.content}</div>
       <div class="post-info">📍地址：${p.addr || '未填写'}</div>
@@ -208,21 +250,46 @@ function renderHome(list=posts){
       <div class="stars">${'★'.repeat(p.rate||0)}</div>
       <button class="btn" onclick="setRate(${i})">⭐打分</button>
       <button class="btn pink" onclick="addWish(${i})">加入心愿单</button>
-      <input placeholder="评论" id="ci${i}" style="margin-top:8px;width:100%;padding:8px">
-      <button class="btn" onclick="addComment(${i})">发送</button>
-      ${p.comments.map(m=>`<div class="comment">${m.user}: ${m.text}</div>`).join('')}
+      <input placeholder="发表评论" id="commentInput${i}" class="edit-area">
+      <button class="btn" onclick="addComment(${i})">发送评论</button>
+      ${renderComments(p.comments, i)}
     </div>`
   })
   $('list').innerHTML = h
 }
 
+// 添加评论
 function addComment(i){
-  if(!currentUser)return
-  let t = $('ci'+i).value.trim()
-  if(!t)return
-  posts[i].comments.push({user:currentUser, text:t})
+  if(!currentUser)return alert('请登录')
+  let text = $(`commentInput${i}`).value.trim()
+  if(!text)return alert('评论不能为空')
+  posts[i].comments.push({
+    user: currentUser,
+    text: text,
+    time: formatDateTime(new Date())
+  })
+  localStorage.setItem('posts', JSON.stringify(posts))
+  $(`commentInput${i}`).value = ''
+  renderHome()
+}
+
+// 编辑评论
+function editComment(postIndex, commentIndex){
+  let comment = posts[postIndex].comments[commentIndex]
+  let newText = prompt('修改评论', comment.text)
+  if(newText === null) return
+  posts[postIndex].comments[commentIndex].text = newText.trim()
   localStorage.setItem('posts', JSON.stringify(posts))
   renderHome()
+}
+
+// 删除评论
+function deleteComment(postIndex, commentIndex){
+  if(confirm('确定删除这条评论？')){
+    posts[postIndex].comments.splice(commentIndex, 1)
+    localStorage.setItem('posts', JSON.stringify(posts))
+    renderHome()
+  }
 }
 
 function setRate(i){
